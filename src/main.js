@@ -27,7 +27,6 @@ function main() {
         console.log("Failde to get context for WebGL");
         return;
     }
-    a();
     const program = gl.createProgram();
     const vsShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vsShader, vsSource);
