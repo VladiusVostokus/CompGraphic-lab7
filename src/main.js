@@ -2,7 +2,7 @@
 
 const vsSource = `#version 300 es
 in vec2 aPosition;
-out vec2 aTexCoord;
+in vec2 aTexCoord;
 out vec2 vTexCoord;
 
 void main() {
@@ -21,7 +21,13 @@ void main() {
     fragColor = texture(uSampler, vTexCoord);
 }`;
 
-function main() {
+const loadImage = (name) => new Promise(resolve => {
+    const image = new Image();
+    image.src = `src/${name}.png`;
+    image.addEventListener('load', () => resolve(image));
+});
+
+const main = async() => {
     const canvas = document.querySelector("#glcanvas");
     const gl = canvas.getContext("webgl2");
     if (!gl) {
@@ -65,11 +71,13 @@ function main() {
     ]);
 
     const textureBufferData = new Float32Array([
-        0, 1,
         0, 0,
+        0, 1,
         1, 0,
         1, 1,
     ]);
+
+    const image = await loadImage('grass');
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -83,10 +91,18 @@ function main() {
     gl.bufferData(gl.ARRAY_BUFFER, textureBufferData, gl.STATIC_DRAW);
     gl.vertexAttribPointer(aTexCoord, 2 , gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aTexCoord);
+
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-}
+};
 
-window.onload = () => {
-    main()
-}
+window.onload = async() => {
+    await main();
+};
