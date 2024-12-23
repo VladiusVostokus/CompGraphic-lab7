@@ -112,8 +112,21 @@ const main = async() => {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     await setImage(gl, 'grass');
-    
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+    let isGrass = true;
+
+    canvas.addEventListener('click', async(e) => {
+        isGrass = !isGrass;
+        let image = '';
+        if (isGrass) {
+            image = 'grass';
+        } else {
+            image = 'stone';
+        }
+        await setImage(gl, image);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    });
 };
 
 window.onload = async() => {
