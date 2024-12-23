@@ -2,22 +2,23 @@
 
 const vsSource = `#version 300 es
 in vec2 aPosition;
-in vec3 aColor;
-out vec3 vColor;
+out vec2 aTexCoord;
+out vec2 vTexCoord;
 
 void main() {
     gl_Position =  vec4(aPosition, 0.0, 1.0);
-    vColor = aColor;
+    vTexCoord = aTexCoord;
 }`;
 
 const fsSource = `#version 300 es
 precision mediump float;
 
-in vec3 vColor;
+in vec2 vTexCoord;
 out vec4 fragColor;
+uniform sampler2D uSampler;
 
 void main() {
-    fragColor = vec4(vColor, 1.0);
+    fragColor = texture(uSampler, vTexCoord);
 }`;
 
 function main() {
@@ -54,25 +55,20 @@ function main() {
     gl.useProgram(program);
 
     const aPosition = gl.getAttribLocation(program, 'aPosition');
-    const aColor = gl.getAttribLocation(program,'aColor');
 
     const bufferData = new Float32Array([
-        -0.5,  0.5,  1,0,0,
-        -0.5, -0.5,  0,1,1,
-         0.5,  0.5,  0,1,0,
-         0.5, -0.5,  0,0,1,
+        -0.5,  0.5,  
+        -0.5, -0.5, 
+         0.5,  0.5,  
+         0.5, -0.5,
     ]);
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
 
-    gl.vertexAttribPointer(aPosition, 2 , gl.FLOAT, false, 5 * 4, 0);
-    gl.vertexAttribPointer(aColor, 3 , gl.FLOAT, false, 5 * 4, 2 * 4);
-
+    gl.vertexAttribPointer(aPosition, 2 , gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(aPosition);
-    gl.enableVertexAttribArray(aColor);
-
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
