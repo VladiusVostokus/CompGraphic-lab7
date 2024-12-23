@@ -43,7 +43,15 @@ const initializeProgram = (glContext) => {
     glContext.linkProgram(program);
 
     return program
-}
+};
+
+const setImage = async (glContext, name) => {
+    const image = await loadImage(name);
+    glContext.texImage2D(glContext.TEXTURE_2D, 0, glContext.RGB, glContext.RGB, glContext.UNSIGNED_BYTE, image);
+    glContext.generateMipmap(glContext.TEXTURE_2D);
+    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MIN_FILTER, glContext.NEAREST);
+    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MAG_FILTER, glContext.NEAREST);
+};
 
 const main = async() => {
     const canvas = document.querySelector("#glcanvas");
@@ -85,7 +93,6 @@ const main = async() => {
         1, 1,
     ]);
 
-    const image = await loadImage('stone');
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     const buffer = gl.createBuffer();
@@ -103,11 +110,8 @@ const main = async() => {
 
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    await setImage(gl, 'grass');
     
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 };
