@@ -21,11 +21,29 @@ void main() {
     fragColor = texture(uSampler, vTexCoord);
 }`;
 
+
 const loadImage = (name) => new Promise(resolve => {
     const image = new Image();
     image.src = `src/${name}.png`;
     image.addEventListener('load', () => resolve(image));
 });
+
+const initializeProgram = (glContext) => {
+    const program = glContext.createProgram();
+    const vsShader = glContext.createShader(glContext.VERTEX_SHADER);
+    glContext.shaderSource(vsShader, vsSource);
+    glContext.compileShader(vsShader);
+    glContext.attachShader(program, vsShader);
+
+    const fsShader = glContext.createShader(glContext.FRAGMENT_SHADER);
+    glContext.shaderSource(fsShader, fsSource);
+    glContext.compileShader(fsShader);
+    glContext.attachShader(program, fsShader);
+
+    glContext.linkProgram(program);
+
+    return program
+}
 
 const main = async() => {
     const canvas = document.querySelector("#glcanvas");
@@ -34,18 +52,8 @@ const main = async() => {
         console.log("Failde to get context for WebGL");
         return;
     }
-    const program = gl.createProgram();
-    const vsShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vsShader, vsSource);
-    gl.compileShader(vsShader);
-    gl.attachShader(program, vsShader);
-
-    const fsShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fsShader, fsSource);
-    gl.compileShader(fsShader);
-    gl.attachShader(program, fsShader);
-
-    gl.linkProgram(program);
+    
+    const program = initializeProgram(gl);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         console.log(gl.getShaderInfoLog(vsShader));
@@ -77,7 +85,8 @@ const main = async() => {
         1, 1,
     ]);
 
-    const image = await loadImage('grass');
+    const image = await loadImage('stone');
+    //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
