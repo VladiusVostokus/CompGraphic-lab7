@@ -48,7 +48,7 @@ const initializeProgram = (glContext) => {
 const setImage = async (glContext, name) => {
     const image = await loadImage(name);
     glContext.texImage2D(glContext.TEXTURE_2D, 0, glContext.RGB, glContext.RGB, glContext.UNSIGNED_BYTE, image);
-    glContext.generateMipmap(glContext.TEXTURE_2D);
+    glContext.texParameteri(glContext.TEXTURE_2D, glContext.TEXTURE_MIN_FILTER, glContext.NEAREST);  
 };
 
 const main = async() => {
